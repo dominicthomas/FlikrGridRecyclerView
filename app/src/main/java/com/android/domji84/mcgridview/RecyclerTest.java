@@ -5,6 +5,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +13,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.common.collect.Lists;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -28,6 +28,8 @@ import static com.android.domji84.mcgridview.FlikrApiClient.getFlikrApiClient;
 
 public class RecyclerTest extends ActionBarActivity implements SwipeRefreshLayout.OnRefreshListener {
 
+	private static final String TAG = RecyclerTest.class.getSimpleName();
+
 	private RecyclerView mRecyclerView;
 
 	private GridItemAdapter mAdapter;
@@ -35,10 +37,6 @@ public class RecyclerTest extends ActionBarActivity implements SwipeRefreshLayou
 	private GridLayoutManager mLayoutManager;
 
 	private SwipeRefreshLayout mSwipeRefreshLayout;
-
-	private int mCurrentPage;
-
-	private int mTotalPageCount;
 
 	public interface GridItemObjectTapListener {
 		public void itemTap(int position);
@@ -60,7 +58,7 @@ public class RecyclerTest extends ActionBarActivity implements SwipeRefreshLayou
 		mRecyclerView.setHasFixedSize(true);
 	}
 
-	private final GridItemObjectTapListener mGridItemObjectTapListener = new GridItemObjectTapListener(){
+	private final GridItemObjectTapListener mGridItemObjectTapListener = new GridItemObjectTapListener() {
 		@Override
 		public void itemTap(int position) {
 			Toast.makeText(getApplicationContext(), "tapped " + position, Toast.LENGTH_SHORT).show();
@@ -70,30 +68,33 @@ public class RecyclerTest extends ActionBarActivity implements SwipeRefreshLayou
 	@Override
 	protected void onResume() {
 		super.onResume();
-		loadImageData(0);
+		loadImageData(1);
+		mRecyclerView.scrollToPosition(0);
 	}
 
 	@Override
 	public void onRefresh() {
-		loadImageData(0);
+		loadImageData(1);
 	}
 
 	private void loadImageData(final int page) {
 		getFlikrApiClient().getRecentPhotos(
-			FlikrApiClient.FlikrApiParams.getRecentParams(page, Lists.newArrayList("owner_name")),
+			FlikrApiClient.FlikrApiParams.getRecentParams(page),
 			new Callback<Recent>() {
 				@Override
 				public void success(Recent recent, Response response) {
+
 					final List<Photo> photoList = recent.getPhotos().getPhotoList();
-					if (page == 0) { // first page or swipe refresh
-						mAdapter.setItems(photoList);
-					} else {
-						mAdapter.addItems(photoList);
-					}
-					mCurrentPage = recent.getPhotos().getPage();
-					mTotalPageCount = recent.getPhotos().getPages();
+					final int currentPage = recent.getPhotos().getPage();
+					final int totalPages = recent.getPhotos().getPages();
 					mAdapter.notifyDataSetChanged();
 					mSwipeRefreshLayout.setRefreshing(false);
+
+					if (page == 1) { // first page
+						mAdapter.setItems(photoList, currentPage, totalPages);
+					} else {
+						mAdapter.addItems(photoList, currentPage, totalPages);
+					}
 				}
 
 				@Override
@@ -105,9 +106,13 @@ public class RecyclerTest extends ActionBarActivity implements SwipeRefreshLayou
 
 	public class GridItemAdapter extends RecyclerView.Adapter<GridItemAdapter.ViewHolder> {
 
-		private List<Photo> items = new ArrayList<Photo>();
+		private List<Photo> mItems = new ArrayList<Photo>();
 
-		private GridItemObjectTapListener tapListener;
+		private GridItemObjectTapListener mTapListener;
+
+		private int mCurrentPage;
+
+		private int mTotalPageCount;
 
 		public class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -122,7 +127,7 @@ public class RecyclerTest extends ActionBarActivity implements SwipeRefreshLayou
 		}
 
 		public void setObjectTapListener(GridItemObjectTapListener listener) {
-			tapListener = listener;
+			mTapListener = listener;
 		}
 
 		@Override
@@ -136,7 +141,8 @@ public class RecyclerTest extends ActionBarActivity implements SwipeRefreshLayou
 
 		@Override
 		public void onBindViewHolder(ViewHolder holder, int position) {
-			final Photo item = items.get(position);
+
+			final Photo item = mItems.get(position);
 			holder.owner.setText(item.getOwnerName());
 			Picasso.with(holder.image.getContext()).cancelRequest(holder.image);
 			Picasso.with(holder.image.getContext()).load(FlikrApiUrls.getPhotoUrl(item,
@@ -145,39 +151,47 @@ public class RecyclerTest extends ActionBarActivity implements SwipeRefreshLayou
 				@Override
 				public void onClick(View view) {
 					if (item != null)
-						tapListener.itemTap(items.indexOf(item));
+						mTapListener.itemTap(mItems.indexOf(item));
 				}
 			});
 			holder.itemView.setTag(item);
 
-			if (position == items.size() - 1 && mCurrentPage <= mTotalPageCount) {
+			// infinite scrolling checker
+			if (position == mItems.size() - 1 && mCurrentPage <= mTotalPageCount) {
 				if (mCurrentPage == mTotalPageCount) {
 					Toast.makeText(RecyclerTest.this, "No more pages!", Toast.LENGTH_SHORT).show();
 				} else {
-					loadImageData(mCurrentPage++);
+					Log.d(TAG, "mCurrentPage: " + String.valueOf(mCurrentPage));
+					int newPage = mCurrentPage + 1;
+					Log.d(TAG, "newPage: " + String.valueOf(newPage));
+					loadImageData(newPage);
 				}
 			}
 		}
 
 		@Override
 		public int getItemCount() {
-			return items.size();
+			return mItems.size();
 		}
 
-		public void setItems(List<Photo> photoList) {
-			items = photoList;
+		public void setItems(List<Photo> photoList, int currentPage, int totalPages) {
+			mItems = photoList;
+			mCurrentPage = currentPage;
+			mTotalPageCount = totalPages;
 		}
 
-		public void addItems(List<Photo> photoList) {
+		public void addItems(List<Photo> photoList, int currentPage, int totalPages) {
 			for (Photo photo : photoList) {
-				items.add(photo);
+				mItems.add(photo);
 			}
+			mCurrentPage = currentPage;
+			mTotalPageCount = totalPages;
 			mAdapter.notifyDataSetChanged();
 		}
 
 		public Photo getItemAt(int position) {
-			if (position < items.size())
-				return items.get(position);
+			if (position < mItems.size())
+				return mItems.get(position);
 			return null;
 		}
 	}

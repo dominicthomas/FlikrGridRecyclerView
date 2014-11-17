@@ -73,7 +73,7 @@ public class FlikrApiClient {
 		}
 
 		public static Map<String, String> getRecentParams(int page) {
-			return getRecentParams(page, null);
+			return getRecentParams(page, Lists.newArrayList("owner_name"));
 		}
 
 	}
