@@ -47,7 +47,6 @@ public class RecyclerTest extends ActionBarActivity implements SwipeRefreshLayou
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_recycler_test);
 		mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-		// TODO: scroll listener to show [Top] button when scrolling up
 		mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
 		mSwipeRefreshLayout.setOnRefreshListener(this);
 		mLayoutManager = new GridLayoutManager(this, 2);
@@ -83,17 +82,18 @@ public class RecyclerTest extends ActionBarActivity implements SwipeRefreshLayou
 			new Callback<Recent>() {
 				@Override
 				public void success(Recent recent, Response response) {
-
 					final List<Photo> photoList = recent.getPhotos().getPhotoList();
 					final int currentPage = recent.getPhotos().getPage();
 					final int totalPages = recent.getPhotos().getPages();
-					mAdapter.notifyDataSetChanged();
 					mSwipeRefreshLayout.setRefreshing(false);
-
-					if (page == 1) { // first page
-						mAdapter.setItems(photoList, currentPage, totalPages);
+					if (photoList != null) {
+						if (page == 1) { // first page
+							mAdapter.setItems(photoList, currentPage, totalPages);
+						} else {
+							mAdapter.addItems(photoList, currentPage, totalPages);
+						}
 					} else {
-						mAdapter.addItems(photoList, currentPage, totalPages);
+						// TODO: show error fragment!
 					}
 				}
 
@@ -178,6 +178,7 @@ public class RecyclerTest extends ActionBarActivity implements SwipeRefreshLayou
 			mItems = photoList;
 			mCurrentPage = currentPage;
 			mTotalPageCount = totalPages;
+			notifyDataSetChanged();
 		}
 
 		public void addItems(List<Photo> photoList, int currentPage, int totalPages) {
@@ -186,7 +187,7 @@ public class RecyclerTest extends ActionBarActivity implements SwipeRefreshLayou
 			}
 			mCurrentPage = currentPage;
 			mTotalPageCount = totalPages;
-			mAdapter.notifyDataSetChanged();
+			notifyDataSetChanged();
 		}
 
 		public Photo getItemAt(int position) {
