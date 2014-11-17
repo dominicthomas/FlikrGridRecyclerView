@@ -45,7 +45,6 @@ public class RecyclerFragment extends Fragment {
 	}
 
 	private void loadImages() {
-
 		getFlikrApiClient().getRecentPhotos(
 			FlikrApiParams.getRecentParams(0), // TODO: track page number
 			new Callback<Recent>() {
