@@ -32,6 +32,7 @@ public class FlikrApiClient {
 		return mFlikrApiInterface;
 	}
 
+	// TODO: Comments for these
 
 	public static class FlikrApiParams {
 		public static Map<String, String> getRecentParams(int page) {
@@ -49,7 +50,7 @@ public class FlikrApiClient {
 	public static class FlikrApiUrls {
 		public static String getPhotoUrl(Photo photo) {
 			return Joiner.on("").join("https://farm", photo.getFarm(), ".staticflickr.com/", photo.getServer(),
-				"/", photo.getId(), "_", photo.getSecret(), "_q.jpg").toString();
+				"/", photo.getId(), "_", photo.getSecret(), "_z.jpg").toString();
 		}
 	}
 
