@@ -1,6 +1,7 @@
 package com.android.domji84.mcgridview;
 
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,11 +24,12 @@ import static com.android.domji84.mcgridview.FlikrApiClient.FlikrApiUrls;
 import static com.android.domji84.mcgridview.FlikrApiClient.PhotoSize;
 import static com.android.domji84.mcgridview.FlikrApiClient.getFlikrApiClient;
 
-public class RecyclerTest extends ActionBarActivity {
+public class RecyclerTest extends ActionBarActivity implements SwipeRefreshLayout.OnRefreshListener {
 
-	private RecyclerView recyclerView;
+	private RecyclerView mRecyclerView;
 	private MyAdapter mAdapter;
-	private RecyclerView.LayoutManager mLayoutManager;
+	private GridLayoutManager mLayoutManager;
+	private SwipeRefreshLayout mSwipeRefreshLayout;
 
 	public interface MyObjectTapListener {
 		public void itemTap(int position);
@@ -37,9 +39,11 @@ public class RecyclerTest extends ActionBarActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_recycler_test);
-		recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+		mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+		mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
+		mSwipeRefreshLayout.setOnRefreshListener(this);
 		mLayoutManager = new GridLayoutManager(this, 2);
-		recyclerView.setLayoutManager(mLayoutManager);
+		mRecyclerView.setLayoutManager(mLayoutManager);
 		mAdapter = new MyAdapter();
 		mAdapter.setObjectTapListener(new MyObjectTapListener() {
 			@Override
@@ -47,19 +51,25 @@ public class RecyclerTest extends ActionBarActivity {
 				Toast.makeText(getApplicationContext(), "tapped " + position, Toast.LENGTH_SHORT).show();
 			}
 		});
-		recyclerView.setAdapter(mAdapter);
-
-		loadImages();
+		mRecyclerView.setAdapter(mAdapter);
+		mRecyclerView.setHasFixedSize(true);
+		loadImageData(0);
 	}
 
-	private void loadImages() {
+	@Override
+	public void onRefresh() {
+		loadImageData(0);
+	}
+
+	private void loadImageData(int page) {
 		getFlikrApiClient().getRecentPhotos(
-			FlikrApiClient.FlikrApiParams.getRecentParams(0), // TODO: track page number
+			FlikrApiClient.FlikrApiParams.getRecentParams(page), // TODO: track page number
 			new Callback<Recent>() {
 				@Override
 				public void success(Recent recent, Response response) {
 					mAdapter.setItems(recent.getPhotos().getPhotoList());
 					mAdapter.notifyDataSetChanged();
+					mSwipeRefreshLayout.setRefreshing(false);
 				}
 
 				@Override
@@ -75,7 +85,7 @@ public class RecyclerTest extends ActionBarActivity {
 		private MyObjectTapListener tapListener;
 
 		/**
-		 * Our view holder class
+		 * The view holder class
 		 */
 		public class ViewHolder extends RecyclerView.ViewHolder {
 			public ImageView image;
@@ -136,12 +146,6 @@ public class RecyclerTest extends ActionBarActivity {
 			holder.itemView.setTag(item);
 		}
 
-		public Photo getItemAt(int position) {
-			if (position < items.size())
-				return items.get(position);
-			return null;
-		}
-
 		@Override
 		public int getItemCount() {
 			return items.size();
@@ -150,5 +154,12 @@ public class RecyclerTest extends ActionBarActivity {
 		public void setItems(List<Photo> photoList) {
 			items = photoList;
 		}
+
+		public Photo getItemAt(int position) {
+			if (position < items.size())
+				return items.get(position);
+			return null;
+		}
 	}
+
 }
