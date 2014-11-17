@@ -29,11 +29,18 @@ import static com.android.domji84.mcgridview.FlikrApiClient.getFlikrApiClient;
 public class RecyclerTest extends ActionBarActivity implements SwipeRefreshLayout.OnRefreshListener {
 
 	private RecyclerView mRecyclerView;
-	private MyAdapter mAdapter;
+
+	private GridItemAdapter mAdapter;
+
 	private GridLayoutManager mLayoutManager;
+
 	private SwipeRefreshLayout mSwipeRefreshLayout;
 
-	public interface MyObjectTapListener {
+	private int mCurrentPage;
+
+	private int mTotalPageCount;
+
+	public interface GridItemObjectTapListener {
 		public void itemTap(int position);
 	}
 
@@ -42,19 +49,27 @@ public class RecyclerTest extends ActionBarActivity implements SwipeRefreshLayou
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_recycler_test);
 		mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+		// TODO: scroll listener to show [Top] button when scrolling up
 		mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
 		mSwipeRefreshLayout.setOnRefreshListener(this);
-		mLayoutManager = new GridLayoutManager(this, 3);
+		mLayoutManager = new GridLayoutManager(this, 2);
 		mRecyclerView.setLayoutManager(mLayoutManager);
-		mAdapter = new MyAdapter();
-		mAdapter.setObjectTapListener(new MyObjectTapListener() {
-			@Override
-			public void itemTap(int position) {
-				Toast.makeText(getApplicationContext(), "tapped " + position, Toast.LENGTH_SHORT).show();
-			}
-		});
+		mAdapter = new GridItemAdapter();
+		mAdapter.setObjectTapListener(mGridItemObjectTapListener);
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true);
+	}
+
+	private final GridItemObjectTapListener mGridItemObjectTapListener = new GridItemObjectTapListener(){
+		@Override
+		public void itemTap(int position) {
+			Toast.makeText(getApplicationContext(), "tapped " + position, Toast.LENGTH_SHORT).show();
+		}
+	};
+
+	@Override
+	protected void onResume() {
+		super.onResume();
 		loadImageData(0);
 	}
 
@@ -63,32 +78,37 @@ public class RecyclerTest extends ActionBarActivity implements SwipeRefreshLayou
 		loadImageData(0);
 	}
 
-	private void loadImageData(int page) {
+	private void loadImageData(final int page) {
 		getFlikrApiClient().getRecentPhotos(
-			FlikrApiClient.FlikrApiParams.getRecentParams(page, Lists.newArrayList("owner_name")), // TODO: track page number
+			FlikrApiClient.FlikrApiParams.getRecentParams(page, Lists.newArrayList("owner_name")),
 			new Callback<Recent>() {
 				@Override
 				public void success(Recent recent, Response response) {
-					mAdapter.setItems(recent.getPhotos().getPhotoList());
+					final List<Photo> photoList = recent.getPhotos().getPhotoList();
+					if (page == 0) { // first page or swipe refresh
+						mAdapter.setItems(photoList);
+					} else {
+						mAdapter.addItems(photoList);
+					}
+					mCurrentPage = recent.getPhotos().getPage();
+					mTotalPageCount = recent.getPhotos().getPages();
 					mAdapter.notifyDataSetChanged();
 					mSwipeRefreshLayout.setRefreshing(false);
 				}
 
 				@Override
 				public void failure(RetrofitError error) {
-
+					// TODO: show error fragment!
 				}
 			});
 	}
 
-	public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
+	public class GridItemAdapter extends RecyclerView.Adapter<GridItemAdapter.ViewHolder> {
 
 		private List<Photo> items = new ArrayList<Photo>();
-		private MyObjectTapListener tapListener;
 
-		/**
-		 * The view holder
-		 */
+		private GridItemObjectTapListener tapListener;
+
 		public class ViewHolder extends RecyclerView.ViewHolder {
 
 			public ImageView image;
@@ -101,39 +121,19 @@ public class RecyclerTest extends ActionBarActivity implements SwipeRefreshLayou
 			}
 		}
 
-		/**
-		 * To set the listener we use when an image is clicked
-		 *
-		 * @param listener
-		 */
-		public void setObjectTapListener(MyObjectTapListener listener) {
+		public void setObjectTapListener(GridItemObjectTapListener listener) {
 			tapListener = listener;
 		}
 
-		/**
-		 * Create new views
-		 *
-		 * @param parent
-		 * @param viewType
-		 * @return
-		 */
 		@Override
-		public ViewHolder onCreateViewHolder(ViewGroup parent,
-		                                     int viewType) {
-			// create a new view
-			View v = LayoutInflater.from(parent.getContext())
+		public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+			View view = LayoutInflater.from(parent.getContext())
 				.inflate(R.layout.layout_grid_item, null);
 
-			ViewHolder vh = new ViewHolder(v);
-			return vh;
+			ViewHolder viewHolder = new ViewHolder(view);
+			return viewHolder;
 		}
 
-		/**
-		 * Fill the view with data from the adapter
-		 *
-		 * @param holder
-		 * @param position
-		 */
 		@Override
 		public void onBindViewHolder(ViewHolder holder, int position) {
 			final Photo item = items.get(position);
@@ -148,8 +148,15 @@ public class RecyclerTest extends ActionBarActivity implements SwipeRefreshLayou
 						tapListener.itemTap(items.indexOf(item));
 				}
 			});
-
 			holder.itemView.setTag(item);
+
+			if (position == items.size() - 1 && mCurrentPage <= mTotalPageCount) {
+				if (mCurrentPage == mTotalPageCount) {
+					Toast.makeText(RecyclerTest.this, "No more pages!", Toast.LENGTH_SHORT).show();
+				} else {
+					loadImageData(mCurrentPage++);
+				}
+			}
 		}
 
 		@Override
@@ -159,6 +166,13 @@ public class RecyclerTest extends ActionBarActivity implements SwipeRefreshLayou
 
 		public void setItems(List<Photo> photoList) {
 			items = photoList;
+		}
+
+		public void addItems(List<Photo> photoList) {
+			for (Photo photo : photoList) {
+				items.add(photo);
+			}
+			mAdapter.notifyDataSetChanged();
 		}
 
 		public Photo getItemAt(int position) {

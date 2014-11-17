@@ -9,18 +9,35 @@ import java.util.List;
  */
 public class Photos {
 
-	public int page;
+	private int page;
 
-	public int pages;
+	private int pages;
 
-	public int perpage;
+	private int perpage;
 
-	public int total;
+	private int total;
 
 	@SerializedName("photo")
 	private List<Photo> photoList;
 
+	public int getPage() {
+		return page;
+	}
+
+	public int getPages() {
+		return pages;
+	}
+
+	public int getPerpage() {
+		return perpage;
+	}
+
+	public int getTotal() {
+		return total;
+	}
+
 	public List<Photo> getPhotoList() {
 		return photoList;
 	}
+
 }

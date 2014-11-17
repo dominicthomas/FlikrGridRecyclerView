@@ -12,7 +12,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:background="@android:color/white"
-        android:padding="16dp"
+        android:padding="5dp"
         android:layout_height="wrap_content">
 
         <ImageView
@@ -38,12 +38,48 @@
             android:scaleType="centerCrop">
         </ImageView>
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
+
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_below="@+id/grid_item_image"
-            android:src="@drawable/ic_heart"/>
+            android:layout_alignParentBottom="true"
+            android:gravity="center_vertical"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/grid_item_fav_icon"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentBottom="true"
+                android:src="@drawable/ic_heart"/>
+
+            <TextView
+                android:id="@+id/grid_item_fav_count"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="200"
+                android:gravity="center_vertical"
+                android:layout_alignParentBottom="true"
+                android:layout_toRightOf="@+id/grid_item_fav_icon"/>
+
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="20dp"
+                android:layout_toRightOf="@+id/grid_item_fav_count"
+                android:layout_alignParentBottom="true"
+                android:src="@drawable/ic_comment"/>
+
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:src="@drawable/ic_report"/>
+
+        </RelativeLayout>
 
     </RelativeLayout>
 

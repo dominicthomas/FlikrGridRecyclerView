@@ -21,8 +21,6 @@ public class FlikrApiClient {
 	private static String API_KEY = "0a6006474b146381616f256798b2916f";
 	private static String API_SECRET = "053be28f04771e3e";
 
-	private static FlikrApiInterface mFlikrApiInterface;
-
 	public static enum PhotoSize {
 
 		SMALL_SQUARE_75("s"),
@@ -47,6 +45,8 @@ public class FlikrApiClient {
 			return mSize;
 		}
 	}
+
+	private static FlikrApiInterface mFlikrApiInterface;
 
 	public static FlikrApiInterface getFlikrApiClient() {
 		if (mFlikrApiInterface == null) {
@@ -92,8 +92,5 @@ public class FlikrApiClient {
 		@GET("/rest")
 		void getRecentPhotos(@QueryMap Map<String, String> getRecentParams, Callback<Recent> callback);
 	}
-
-
-	// https://api.flickr.com/services/rest/?method=flickr.interestingness.getList&api_key=0a6006474b146381616f256798b2916f&extras=count_faves%2count_comments%2CCisfavorite%2Ccontact%2Ccamera%2Ctags%2Curl_k%2Curl_h&format=json&nojsoncallback=1
 
 }
