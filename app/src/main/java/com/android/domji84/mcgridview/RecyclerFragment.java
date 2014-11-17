@@ -11,6 +11,7 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import com.google.common.collect.Lists;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -46,7 +47,7 @@ public class RecyclerFragment extends Fragment {
 
 	private void loadImages() {
 		getFlikrApiClient().getRecentPhotos(
-			FlikrApiParams.getRecentParams(0), // TODO: track page number
+			FlikrApiParams.getRecentParams(0, Lists.newArrayList("owner_name")),
 			new Callback<Recent>() {
 				@Override
 				public void success(Recent recent, Response response) {

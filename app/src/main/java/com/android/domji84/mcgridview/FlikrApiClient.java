@@ -1,8 +1,10 @@
 package com.android.domji84.mcgridview;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import retrofit.Callback;
@@ -59,14 +61,19 @@ public class FlikrApiClient {
 
 	public static class FlikrApiParams {
 
-		public static Map<String, String> getRecentParams(int page) {
+		public static Map<String, String> getRecentParams(int page, List<String> extras) {
 			Map<String, String> params = new HashMap<String, String>();
 			params.put("method", "flickr.photos.getRecent");
 			params.put("api_key", API_KEY);
 			params.put("format", "json");
-			params.put("nojsoncallback", "?");
+			params.put("nojsoncallback", "1");
 			params.put("page", page > 0 ? String.valueOf(page) : String.valueOf(0));
+			params.put("extras", Joiner.on(",").join(extras == null ? Lists.newArrayList() : extras));
 			return params;
+		}
+
+		public static Map<String, String> getRecentParams(int page) {
+			return getRecentParams(page, null);
 		}
 
 	}
@@ -85,5 +92,8 @@ public class FlikrApiClient {
 		@GET("/rest")
 		void getRecentPhotos(@QueryMap Map<String, String> getRecentParams, Callback<Recent> callback);
 	}
+
+
+	// https://api.flickr.com/services/rest/?method=flickr.interestingness.getList&api_key=0a6006474b146381616f256798b2916f&extras=count_faves%2count_comments%2CCisfavorite%2Ccontact%2Ccamera%2Ctags%2Curl_k%2Curl_h&format=json&nojsoncallback=1
 
 }

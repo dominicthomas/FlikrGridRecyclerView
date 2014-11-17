@@ -19,13 +19,20 @@ public class Photo {
 
 	private String title;
 
-	private int ispublic;
+	@SerializedName("ispublic")
+	private int isPublic;
 
-	private int perpage;
+	@SerializedName("perpage")
+	private int perPage;
 
-	private int isfriend;
+	@SerializedName("isfriend")
+	private int isFriend;
 
-	private int isfamily;
+	@SerializedName("isfamily")
+	private int isFamily;
+
+	@SerializedName("ownername")
+	private String ownerName;
 
 	public String getId() {
 		return id;
@@ -52,18 +59,22 @@ public class Photo {
 	}
 
 	public int getIspublic() {
-		return ispublic;
+		return isPublic;
 	}
 
-	public int getPerpage() {
-		return perpage;
+	public int getPerPage() {
+		return perPage;
 	}
 
-	public int getIsfriend() {
-		return isfriend;
+	public int getIsFriend() {
+		return isFriend;
 	}
 
-	public int getIsfamily() {
-		return isfamily;
+	public int getIsFamily() {
+		return isFamily;
+	}
+
+	public String getOwnerName() {
+		return ownerName;
 	}
 }

@@ -9,8 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.common.collect.Lists;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -42,7 +44,7 @@ public class RecyclerTest extends ActionBarActivity implements SwipeRefreshLayou
 		mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 		mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
 		mSwipeRefreshLayout.setOnRefreshListener(this);
-		mLayoutManager = new GridLayoutManager(this, 2);
+		mLayoutManager = new GridLayoutManager(this, 3);
 		mRecyclerView.setLayoutManager(mLayoutManager);
 		mAdapter = new MyAdapter();
 		mAdapter.setObjectTapListener(new MyObjectTapListener() {
@@ -63,7 +65,7 @@ public class RecyclerTest extends ActionBarActivity implements SwipeRefreshLayou
 
 	private void loadImageData(int page) {
 		getFlikrApiClient().getRecentPhotos(
-			FlikrApiClient.FlikrApiParams.getRecentParams(page), // TODO: track page number
+			FlikrApiClient.FlikrApiParams.getRecentParams(page, Lists.newArrayList("owner_name")), // TODO: track page number
 			new Callback<Recent>() {
 				@Override
 				public void success(Recent recent, Response response) {
@@ -85,14 +87,17 @@ public class RecyclerTest extends ActionBarActivity implements SwipeRefreshLayou
 		private MyObjectTapListener tapListener;
 
 		/**
-		 * The view holder class
+		 * The view holder
 		 */
 		public class ViewHolder extends RecyclerView.ViewHolder {
-			public ImageView image;
 
-			public ViewHolder(View v) {
-				super(v);
-				image = (ImageView) v.findViewById(R.id.grid_item_image);
+			public ImageView image;
+			public TextView owner;
+
+			public ViewHolder(View view) {
+				super(view);
+				owner = (TextView) view.findViewById(R.id.grid_item_owner);
+				image = (ImageView) view.findViewById(R.id.grid_item_image);
 			}
 		}
 
@@ -132,6 +137,7 @@ public class RecyclerTest extends ActionBarActivity implements SwipeRefreshLayou
 		@Override
 		public void onBindViewHolder(ViewHolder holder, int position) {
 			final Photo item = items.get(position);
+			holder.owner.setText(item.getOwnerName());
 			Picasso.with(holder.image.getContext()).cancelRequest(holder.image);
 			Picasso.with(holder.image.getContext()).load(FlikrApiUrls.getPhotoUrl(item,
 				PhotoSize.MEDIUM_640)).into(holder.image);
