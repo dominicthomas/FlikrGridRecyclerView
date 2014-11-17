@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
@@ -19,6 +18,8 @@ import java.util.List;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
+
+import static com.android.domji84.mcgridview.FlikrApiClient.*;
 
 /**
  * Created by domji84 on 14/11/14.
@@ -45,16 +46,14 @@ public class RecyclerFragment extends Fragment {
 
 	private void loadImages() {
 
-		// TODO: Track Page Number...
-
-		FlikrApiClient.getFlikrApiClient().getRecentPhotos(
-			FlikrApiClient.FlikrApiParams.getRecentParams(0),
+		getFlikrApiClient().getRecentPhotos(
+			FlikrApiParams.getRecentParams(0), // TODO: track page number
 			new Callback<Recent>() {
 				@Override
 				public void success(Recent recent, Response response) {
 					Log.d(TAG, String.valueOf(recent));
 					for (Photo photo : recent.getPhotos().getPhotoList()) {
-						Log.d(TAG, FlikrApiClient.FlikrApiUrls.getPhotoUrl(photo));
+						Log.d(TAG, FlikrApiUrls.getPhotoUrl(photo, PhotoSize.MEDIUM_640));
 					}
 					mGridView.setAdapter(new ImageAdapter(getActivity(), recent.getPhotos().getPhotoList()));
 				}
@@ -90,7 +89,7 @@ public class RecyclerFragment extends Fragment {
 			}
 
 			Picasso.with(mContext)
-				.load(FlikrApiClient.FlikrApiUrls.getPhotoUrl(mPhotoList.get(position)))
+				.load(FlikrApiUrls.getPhotoUrl(mPhotoList.get(position), PhotoSize.MEDIUM_640))
 				.into(viewHolder.gridItemImage);
 
 			return convertView;

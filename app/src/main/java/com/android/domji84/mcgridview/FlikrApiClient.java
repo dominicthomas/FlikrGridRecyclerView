@@ -21,6 +21,31 @@ public class FlikrApiClient {
 
 	private static FlikrApiInterface mFlikrApiInterface;
 
+	public static enum PhotoSize {
+
+		SMALL_SQUARE_75("s"),
+		LARGE_SQUARE_150("q"),
+		THUMBNAIL_100("t"),
+		SMALL_240("m"),
+		SMALL_320("n"),
+		MEDIUM_640("z"),
+		MEDIUM_800("c"),
+		LARGE_1024("b"),
+		LARGE_1600("h"),
+		LARGE_2048("k"),
+		ORIGINAL("o");
+
+		private String mSize;
+
+		PhotoSize(String size) {
+			mSize = size;
+		}
+
+		public String getSize() {
+			return mSize;
+		}
+	}
+
 	public static FlikrApiInterface getFlikrApiClient() {
 		if (mFlikrApiInterface == null) {
 			RestAdapter restAdapter = new RestAdapter.Builder()
@@ -32,9 +57,8 @@ public class FlikrApiClient {
 		return mFlikrApiInterface;
 	}
 
-	// TODO: Comments for these
-
 	public static class FlikrApiParams {
+
 		public static Map<String, String> getRecentParams(int page) {
 			Map<String, String> params = new HashMap<String, String>();
 			params.put("method", "flickr.photos.getRecent");
@@ -48,10 +72,12 @@ public class FlikrApiClient {
 	}
 
 	public static class FlikrApiUrls {
-		public static String getPhotoUrl(Photo photo) {
+
+		public static String getPhotoUrl(Photo photo, PhotoSize size) {
 			return Joiner.on("").join("https://farm", photo.getFarm(), ".staticflickr.com/", photo.getServer(),
-				"/", photo.getId(), "_", photo.getSecret(), "_z.jpg").toString();
+				"/", photo.getId(), "_", photo.getSecret(), "_" + size.getSize() + ".jpg").toString();
 		}
+
 	}
 
 	public interface FlikrApiInterface {
