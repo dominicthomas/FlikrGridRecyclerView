@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.GridLayoutAnimationController;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,7 +22,6 @@ import java.util.List;
  * Created by domji84 on 18/11/14.
  */
 public class GridItemAdapter extends RecyclerView.Adapter<GridItemAdapter.ViewHolder> {
-
 
 	private List<Photo> mItems = new ArrayList<Photo>();
 
@@ -93,6 +93,7 @@ public class GridItemAdapter extends RecyclerView.Adapter<GridItemAdapter.ViewHo
 				mLoadImagesListener.loadPage(newPage);
 			}
 		}
+
 	}
 
 	private int getDummyValue(){
