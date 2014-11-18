@@ -7,7 +7,6 @@ import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,11 +62,24 @@ public class RecentImageGridFragment extends Fragment implements SwipeRefreshLay
 		mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
 		mSwipeRefreshLayout.setOnRefreshListener(this);
 		mRecyclerView.forceLayout();
-		mLayoutManager = new GridLayoutManager(getActivity(), 2); // TODO: screen width by item width for column count
+		mLayoutManager = new GridLayoutManager(getActivity(), 2); // initial span count
 		mRecyclerView.setLayoutManager(mLayoutManager);
 		mAdapter = new GridItemAdapter(mGridItemObjectTapListener, mLoadImagesListener);
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true);
+
+		// calculate span count using recycler view width and card width
+		mRecyclerView.getViewTreeObserver().addOnGlobalLayoutListener(
+			new ViewTreeObserver.OnGlobalLayoutListener() {
+				@Override
+				public void onGlobalLayout() {
+					mRecyclerView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+					int viewWidth = mRecyclerView.getMeasuredWidth();
+					float cardViewWidth = getActivity().getResources().getDimension(R.dimen.cardview_layout_width);
+					int newSpanCount = (int) Math.floor(viewWidth / cardViewWidth);
+					mLayoutManager.setSpanCount(newSpanCount);
+				}
+			});
 	}
 
 	private final GridItemObjectTapListener mGridItemObjectTapListener = new GridItemObjectTapListener() {

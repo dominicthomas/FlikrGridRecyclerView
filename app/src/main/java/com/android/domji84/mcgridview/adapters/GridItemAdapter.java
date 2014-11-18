@@ -7,11 +7,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.domji84.mcgridview.interfaces.GridItemObjectTapListener;
-import com.android.domji84.mcgridview.interfaces.LoadImagesListener;
 import com.android.domji84.mcgridview.R;
 import com.android.domji84.mcgridview.api.FlikrApiClient;
 import com.android.domji84.mcgridview.api.model.Photo;
+import com.android.domji84.mcgridview.interfaces.GridItemObjectTapListener;
+import com.android.domji84.mcgridview.interfaces.LoadImagesListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -78,9 +78,9 @@ public class GridItemAdapter extends RecyclerView.Adapter<GridItemAdapter.ViewHo
 					mTapListener.itemTap(view, mItems.indexOf(item));
 			}
 		});
-//		holder.commentCount.setText(String.valueOf(Math.random()));
-//		holder.favCount.setText();
 		holder.itemView.setTag(item);
+		holder.commentCount.setText(String.valueOf(getDummyValue()));
+		holder.favCount.setText(String.valueOf(getDummyValue()));
 
 		// infinite scroll handling
 		if (position == mItems.size() - 1 && mCurrentPage <= mTotalPageCount) {
@@ -91,6 +91,10 @@ public class GridItemAdapter extends RecyclerView.Adapter<GridItemAdapter.ViewHo
 				mLoadImagesListener.loadPage(newPage);
 			}
 		}
+	}
+
+	private int getDummyValue(){
+		return (int) Math.floor(Math.random() * 150);
 	}
 
 	@Override
