@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">MCGridview</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
-    <string name="title_activity_recycler_test">RecyclerTest</string>
+    <string name="app_name">Flikr Photo Stream</string>
 
 </resources>

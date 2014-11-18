@@ -1,4 +1,4 @@
-package com.android.domji84.mcgridview;
+package com.android.domji84.mcgridview.api.model;
 
 import com.google.gson.annotations.SerializedName;
 

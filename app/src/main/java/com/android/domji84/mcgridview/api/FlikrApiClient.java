@@ -1,5 +1,7 @@
-package com.android.domji84.mcgridview;
+package com.android.domji84.mcgridview.api;
 
+import com.android.domji84.mcgridview.api.model.Photo;
+import com.android.domji84.mcgridview.api.model.Recent;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 

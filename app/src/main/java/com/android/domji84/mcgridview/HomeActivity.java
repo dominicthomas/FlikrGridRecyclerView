@@ -2,13 +2,8 @@ package com.android.domji84.mcgridview;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 
-import java.util.List;
-
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import com.android.domji84.mcgridview.fragments.RecentImageGridFragment;
 
 
 public class HomeActivity extends ActionBarActivity {
@@ -21,7 +16,7 @@ public class HomeActivity extends ActionBarActivity {
 		setContentView(R.layout.activity_home);
 		if (savedInstanceState == null) {
 			getFragmentManager().beginTransaction()
-				.add(R.id.container, new RecyclerFragment())
+				.add(R.id.container, new RecentImageGridFragment())
 				.commit();
 		}
 	}
