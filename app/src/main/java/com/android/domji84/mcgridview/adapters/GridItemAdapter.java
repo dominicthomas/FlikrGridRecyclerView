@@ -79,6 +79,8 @@ public class GridItemAdapter extends RecyclerView.Adapter<GridItemAdapter.ViewHo
 			}
 		});
 		holder.itemView.setTag(item);
+
+		// dummy values for faves and comments
 		holder.commentCount.setText(String.valueOf(getDummyValue()));
 		holder.favCount.setText(String.valueOf(getDummyValue()));
 

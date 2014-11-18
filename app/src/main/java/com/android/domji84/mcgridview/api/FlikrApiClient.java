@@ -87,6 +87,10 @@ public class FlikrApiClient {
 				"/", photo.getId(), "_", photo.getSecret(), "_" + size.getSize() + ".jpg").toString();
 		}
 
+		public static String getPhotoUrl(Photo photo) {
+			return getPhotoUrl(photo, PhotoSize.MEDIUM_640);
+		}
+
 	}
 
 	public interface FlikrApiInterface {

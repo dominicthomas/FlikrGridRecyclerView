@@ -1,6 +1,7 @@
 package com.android.domji84.mcgridview.fragments;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityOptionsCompat;
@@ -13,6 +14,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
+import com.android.domji84.mcgridview.ImageViewerActivity;
 import com.android.domji84.mcgridview.R;
 import com.android.domji84.mcgridview.adapters.GridItemAdapter;
 import com.android.domji84.mcgridview.api.FlikrApiClient;
@@ -29,6 +31,7 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
+import static com.android.domji84.mcgridview.api.FlikrApiClient.FlikrApiUrls.*;
 import static com.android.domji84.mcgridview.api.FlikrApiClient.getFlikrApiClient;
 
 /**
@@ -80,13 +83,20 @@ public class RecentImageGridFragment extends Fragment implements SwipeRefreshLay
 					mLayoutManager.setSpanCount(newSpanCount);
 				}
 			});
+
+		// load first page
+		loadImageData(1);
 	}
 
 	private final GridItemObjectTapListener mGridItemObjectTapListener = new GridItemObjectTapListener() {
 		@Override
 		public void itemTap(View view, int position) {
-			Bundle b = ActivityOptionsCompat.makeScaleUpAnimation(view, 0, 0, view.getWidth(), view.getHeight()).toBundle();
 			Toast.makeText(getActivity(), "tapped " + position, Toast.LENGTH_SHORT).show();
+			final Intent intent = new Intent(getActivity(), ImageViewerActivity.class);
+			final Bundle activityOptions  = ActivityOptionsCompat.makeScaleUpAnimation(
+				view, 0, 0, view.getWidth(), view.getHeight()).toBundle();
+			intent.putExtra("url", getPhotoUrl(mAdapter.getItemAt(position)));
+			startActivity(intent, activityOptions);
 		}
 	};
 
@@ -101,13 +111,6 @@ public class RecentImageGridFragment extends Fragment implements SwipeRefreshLay
 			Toast.makeText(getActivity(), "No more pages!", Toast.LENGTH_SHORT).show();
 		}
 	};
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		loadImageData(1); // load first page
-		mRecyclerView.scrollToPosition(0);
-	}
 
 	@Override
 	public void onRefresh() {

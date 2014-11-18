@@ -77,4 +77,6 @@ public class Photo {
 	public String getOwnerName() {
 		return ownerName;
 	}
+
+
 }
