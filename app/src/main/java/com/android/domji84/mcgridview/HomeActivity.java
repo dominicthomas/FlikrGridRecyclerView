@@ -8,8 +8,6 @@ import com.android.domji84.mcgridview.fragments.RecentImageGridFragment;
 
 public class HomeActivity extends ActionBarActivity {
 
-	private static final String TAG = HomeActivity.class.getSimpleName();
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -19,11 +17,6 @@ public class HomeActivity extends ActionBarActivity {
 				.add(R.id.container, new RecentImageGridFragment())
 				.commit();
 		}
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
 	}
 
 }
