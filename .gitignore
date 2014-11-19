@@ -1,6 +1,57 @@
-.gradle
-/local.properties
+#==== Android Studio / Gradle
+ 
+# built application files
+*.apk
+*.ap_
+ 
+# files for the dex VM
+*.dex
+ 
+# Java class files
+*.class
+ 
+# Generated files
+bin/
+gen/
+out/
+build/
+.gradle/
+ 
+# Project files
+*.iml
+.idea
 /.idea/workspace.xml
-/.idea/libraries
+ 
+# Local configuration file (sdk path, etc)
+local.properties
+keystore.properties
+/local.properties
+ 
+# Other
 .DS_Store
-/build
+tmp
+ 
+# Idea non-crucial project fileS
+*.iws
+ 
+ 
+#==== Others
+ 
+# Eclipse
+.project
+.classpath
+.settings
+.checkstyle
+ 
+# Maven
+target
+release.properties
+pom.xml.*
+ 
+# Ant
+bin
+gen
+build.xml
+ant.properties
+proguard.cfg
+proguard-project.txt
