@@ -157,7 +157,6 @@ public class RecentImageGridFragment extends android.support.v4.app.Fragment imp
 	}
 
 	public void loadImageData(final int page, boolean showLoading) {
-		// don't show progress bar when loading first page
 		showLoadingSpinner(showLoading);
 		removeErrorFragment();
 		getFlikrApiClient().getRecentPhotos(

@@ -15,6 +15,8 @@ public class ImageViewerActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
 		super.onCreate(savedInstanceState, persistentState);
 		setContentView(R.layout.activity_image_viewer);
+
+		// TODO: implement image viewing
 		String value = getIntent().getExtras().getString(KEY_IMAGE_URL);
 	}
 }
