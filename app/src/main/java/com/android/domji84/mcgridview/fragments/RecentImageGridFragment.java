@@ -37,6 +37,7 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 import static com.android.domji84.mcgridview.AppConstants.KEY_ERROR_MESSAGE;
+import static com.android.domji84.mcgridview.AppConstants.TAG_ERROR_FRAGMENT;
 import static com.android.domji84.mcgridview.api.FlikrApiClient.FlikrApiUrls.getPhotoUrl;
 import static com.android.domji84.mcgridview.api.FlikrApiClient.getFlikrApiClient;
 
@@ -44,8 +45,6 @@ import static com.android.domji84.mcgridview.api.FlikrApiClient.getFlikrApiClien
  * Created by domji84 on 14/11/14.
  */
 public class RecentImageGridFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener {
-
-	private static final String TAG_ERROR_FRAGMENT = "tag_error_fragment";
 
 	private static final int DEFAULT_SPAN_COUNT = 2;
 
@@ -82,7 +81,6 @@ public class RecentImageGridFragment extends android.support.v4.app.Fragment imp
 		calculateRecyclerViewSpanCount(mRecyclerView, mLayoutManager);
 
 		mProgressBar = (ProgressBar) view.findViewById(R.id.recycler_progress_bar);
-
 		loadImageData(1, true);
 	}
 
@@ -213,7 +211,8 @@ public class RecentImageGridFragment extends android.support.v4.app.Fragment imp
 	}
 
 	private boolean isErrorFragmentAdded() {
-		return getActivity().getSupportFragmentManager().findFragmentByTag(TAG_ERROR_FRAGMENT) != null;
+		return getActivity().getSupportFragmentManager()
+			.findFragmentByTag(TAG_ERROR_FRAGMENT) != null;
 	}
 
 	private void addErrorFragment(int messageId) {
@@ -236,10 +235,10 @@ public class RecentImageGridFragment extends android.support.v4.app.Fragment imp
 			showRecyclerView(true);
 			getActivity().getSupportFragmentManager()
 				.beginTransaction()
-				.remove(getActivity().getSupportFragmentManager().findFragmentByTag(TAG_ERROR_FRAGMENT))
+				.remove(getActivity().getSupportFragmentManager()
+					.findFragmentByTag(TAG_ERROR_FRAGMENT))
 				.commit();
 		}
-
 	}
 
 }

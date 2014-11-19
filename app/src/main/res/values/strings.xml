@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Flikr Photo Stream</string>
+    <string name="app_name">MCGridView</string>
+    <string name="home_activity_title">Flikr Photo Stream</string>
     <string name="no_more_pages_message">No more pages!</string>
     <string name="api_error_message">Oops! There is a problem getting images. We will work on resolving this soon.</string>
     <string name="network_error_message">Oops! You don\'t seem to be connected to the internet. Please check your connection and try the app again.</string>

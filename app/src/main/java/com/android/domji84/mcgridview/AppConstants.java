@@ -7,4 +7,5 @@ public class AppConstants {
 
 	public static final String KEY_ERROR_MESSAGE = "key_error_message";
 	public static final String KEY_IMAGE_URL = "key_image_url";
+	public static final String TAG_ERROR_FRAGMENT = "tag_error_fragment";
 }
