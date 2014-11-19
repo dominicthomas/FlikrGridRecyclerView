@@ -8,7 +8,6 @@ import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,13 +17,11 @@ import android.widget.Toast;
 import com.android.domji84.mcgridview.ImageViewerActivity;
 import com.android.domji84.mcgridview.R;
 import com.android.domji84.mcgridview.adapters.GridItemAdapter;
-import com.android.domji84.mcgridview.animators.ReboundItemAnimator;
 import com.android.domji84.mcgridview.api.FlikrApiClient;
 import com.android.domji84.mcgridview.api.model.Photo;
 import com.android.domji84.mcgridview.api.model.Recent;
 import com.android.domji84.mcgridview.interfaces.GridItemObjectTapListener;
 import com.android.domji84.mcgridview.interfaces.LoadImagesListener;
-import com.android.domji84.mcgridview.views.GridRecyclerView;
 
 import org.apache.http.HttpStatus;
 
@@ -44,7 +41,7 @@ public class RecentImageGridFragment extends Fragment implements SwipeRefreshLay
 
 	private static final String TAG = RecentImageGridFragment.class.getSimpleName();
 
-	private GridRecyclerView mRecyclerView;
+	private RecyclerView mRecyclerView;
 
 	private GridItemAdapter mAdapter;
 
@@ -64,15 +61,12 @@ public class RecentImageGridFragment extends Fragment implements SwipeRefreshLay
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		mRecyclerView = (GridRecyclerView) view.findViewById(R.id.recycler_view);
+		mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
 		mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
 		mSwipeRefreshLayout.setOnRefreshListener(this);
 		mLayoutManager = new GridLayoutManager(getActivity(), 2); // initial span count
 		mRecyclerView.setLayoutManager(mLayoutManager);
 		mRecyclerView.setAnimationCacheEnabled(true);
-
-		// TODO: investigate animations not working
-		mRecyclerView.setItemAnimator(new ReboundItemAnimator());
 		mAdapter = new GridItemAdapter(mGridItemObjectTapListener, mLoadImagesListener);
 		mRecyclerView.setAdapter(mAdapter);
 		mRecyclerView.setHasFixedSize(true);

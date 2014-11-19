@@ -4,7 +4,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.GridLayoutAnimationController;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -96,7 +95,7 @@ public class GridItemAdapter extends RecyclerView.Adapter<GridItemAdapter.ViewHo
 
 	}
 
-	private int getDummyValue(){
+	private int getDummyValue() {
 		return (int) Math.floor(Math.random() * 150);
 	}
 
@@ -106,9 +105,17 @@ public class GridItemAdapter extends RecyclerView.Adapter<GridItemAdapter.ViewHo
 	}
 
 	public void setItems(List<Photo> photoList, int currentPage, int totalPages) {
+		mItems.removeAll(mItems);
 		mItems = photoList;
-		mCurrentPage = currentPage;
-		mTotalPageCount = totalPages;
+		setPageTracking(currentPage, totalPages);
+
+		/*
+		Currently unable to load items with animations. We need to call
+		notifyItemInserted or notifyItemRangeInserted to trigger the RecyclerView
+		itemAnimator and there seems to be a bug in the platform where, when adding
+		new items to the dataset and calling notify{...}, we get an index out of bounds exception.
+		This should be fixed in future updates. See https://code.google.com/p/android/issues/detail?id=77232
+		*/
 		notifyDataSetChanged();
 	}
 
@@ -116,9 +123,13 @@ public class GridItemAdapter extends RecyclerView.Adapter<GridItemAdapter.ViewHo
 		for (Photo photo : photoList) {
 			mItems.add(photo);
 		}
+		setPageTracking(currentPage, totalPages);
+		notifyDataSetChanged();
+	}
+
+	private void setPageTracking(int currentPage, int totalPages) {
 		mCurrentPage = currentPage;
 		mTotalPageCount = totalPages;
-		notifyDataSetChanged();
 	}
 
 	public Photo getItemAt(int position) {
