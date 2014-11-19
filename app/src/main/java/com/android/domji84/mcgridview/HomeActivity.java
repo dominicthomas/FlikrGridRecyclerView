@@ -15,9 +15,15 @@ public class HomeActivity extends ActionBarActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_home);
 		if (savedInstanceState == null) {
-			getFragmentManager().beginTransaction()
+			getSupportFragmentManager().beginTransaction()
 				.add(R.id.container, new RecentImageGridFragment())
 				.commit();
 		}
 	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+	}
+
 }

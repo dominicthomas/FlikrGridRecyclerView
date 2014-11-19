@@ -1,9 +1,12 @@
 package com.android.domji84.mcgridview.fragments;
 
-import android.app.Fragment;
+
+import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
@@ -12,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.android.domji84.mcgridview.ImageViewerActivity;
@@ -37,9 +41,13 @@ import static com.android.domji84.mcgridview.api.FlikrApiClient.getFlikrApiClien
 /**
  * Created by domji84 on 14/11/14.
  */
-public class RecentImageGridFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class RecentImageGridFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
 	private static final String TAG = RecentImageGridFragment.class.getSimpleName();
+
+	private static final String ERROR_FRAGMENT_TAG = "error";
+
+	private static final int DEFAULT_SPAN_COUNT = 2;
 
 	private RecyclerView mRecyclerView;
 
@@ -49,43 +57,53 @@ public class RecentImageGridFragment extends Fragment implements SwipeRefreshLay
 
 	private SwipeRefreshLayout mSwipeRefreshLayout;
 
-	private View mFragmentView;
+	private ProgressBar mProgressBar;
 
 	@Nullable
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		mFragmentView = inflater.inflate(R.layout.fragment_refresh_recycler, container, false);
-		return mFragmentView;
+		return inflater.inflate(R.layout.fragment_refresh_recycler, container, false);
 	}
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+
 		mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
 		mSwipeRefreshLayout.setOnRefreshListener(this);
-		mLayoutManager = new GridLayoutManager(getActivity(), 2); // initial span count
-		mRecyclerView.setLayoutManager(mLayoutManager);
+
+		mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+		mRecyclerView.setHasFixedSize(true);
 		mRecyclerView.setAnimationCacheEnabled(true);
+
+		mLayoutManager = new GridLayoutManager(getActivity(), DEFAULT_SPAN_COUNT);
+		mRecyclerView.setLayoutManager(mLayoutManager);
+
 		mAdapter = new GridItemAdapter(mGridItemObjectTapListener, mLoadImagesListener);
 		mRecyclerView.setAdapter(mAdapter);
-		mRecyclerView.setHasFixedSize(true);
 
-		// calculate span count using recyclerview width and card width
-		mRecyclerView.getViewTreeObserver().addOnGlobalLayoutListener(
+		calculateRecyclerViewSpanCount(mRecyclerView, mLayoutManager);
+
+		mProgressBar = (ProgressBar) view.findViewById(R.id.recycler_progress_bar);
+		showLoadingSpinner(true);
+
+		loadImageData(1);
+	}
+
+	private void calculateRecyclerViewSpanCount(final RecyclerView recyclerView, final GridLayoutManager layoutManager){
+		recyclerView.getViewTreeObserver().addOnGlobalLayoutListener(
 			new ViewTreeObserver.OnGlobalLayoutListener() {
 				@Override
 				public void onGlobalLayout() {
-					mRecyclerView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-					int viewWidth = mRecyclerView.getMeasuredWidth();
+					// calculate span  using recyclerview width and cardview width
+					recyclerView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+					int viewWidth = recyclerView.getMeasuredWidth();
 					float cardViewWidth = getActivity().getResources().getDimension(R.dimen.cardview_layout_width);
 					int newSpanCount = (int) Math.floor(viewWidth / cardViewWidth);
-					mLayoutManager.setSpanCount(newSpanCount);
+					layoutManager.setSpanCount(viewWidth == 0 ? 1 : newSpanCount);
 				}
 			});
 
-		// loads first page
-		loadImageData(1);
 	}
 
 	private final GridItemObjectTapListener mGridItemObjectTapListener = new GridItemObjectTapListener() {
@@ -96,9 +114,17 @@ public class RecentImageGridFragment extends Fragment implements SwipeRefreshLay
 			final Bundle activityOptions = ActivityOptionsCompat.makeScaleUpAnimation(
 				view, 0, 0, view.getWidth(), view.getHeight()).toBundle();
 			intent.putExtra("url", getPhotoUrl(mAdapter.getItemAt(position)));
-			startActivity(intent, activityOptions);
+			checkAndStartActivity(intent, activityOptions);
 		}
 	};
+
+	public void checkAndStartActivity(Intent intent, Bundle options) {
+		if (Build.VERSION.SDK_INT >= 16) {
+			ActivityCompat.startActivity(getActivity(), intent, options);
+		} else {
+			getActivity().startActivity(intent);
+		}
+	}
 
 	private final LoadImagesListener mLoadImagesListener = new LoadImagesListener() {
 		@Override
@@ -108,13 +134,15 @@ public class RecentImageGridFragment extends Fragment implements SwipeRefreshLay
 
 		@Override
 		public void noMorePages() {
-			Toast.makeText(getActivity(), "No more pages!", Toast.LENGTH_SHORT).show();
+			Toast.makeText(getActivity(), getActivity().getString(
+					R.string.no_more_pages_message), Toast.LENGTH_SHORT).show();
 		}
 	};
 
 	@Override
 	public void onRefresh() {
-		loadImageData(1); // loads first page
+		// load first page
+		loadImageData(1);
 	}
 
 	private void setupGridAdapterWithResult(int page, Recent recent) {
@@ -123,7 +151,7 @@ public class RecentImageGridFragment extends Fragment implements SwipeRefreshLay
 		final int totalPages = recent.getPhotos().getPages();
 		mSwipeRefreshLayout.setRefreshing(false);
 		if (photoList != null) {
-			if (page == 1) { // first page
+			if (page == 1) { // is first page
 				mAdapter.setItems(photoList, currentPage, totalPages);
 			} else {
 				mAdapter.addItems(photoList, currentPage, totalPages);
@@ -132,6 +160,8 @@ public class RecentImageGridFragment extends Fragment implements SwipeRefreshLay
 	}
 
 	public void loadImageData(final int page) {
+		// don't show progress bar when loading first page
+		removeErrorFragment();
 		getFlikrApiClient().getRecentPhotos(
 			FlikrApiClient.FlikrApiParams.getRecentParams(page), new Callback<Recent>() {
 				@Override
@@ -139,15 +169,74 @@ public class RecentImageGridFragment extends Fragment implements SwipeRefreshLay
 					if (response.getStatus() == HttpStatus.SC_OK) {
 						setupGridAdapterWithResult(page, recent);
 					} else {
-						// TODO: show error fragment!
+						handleGetRecentErrors(RetrofitError.Kind.HTTP);
 					}
+					showLoadingSpinner(false);
 				}
 
 				@Override
 				public void failure(RetrofitError error) {
-					// TODO: show error fragment!
+					showLoadingSpinner(false);
+					handleGetRecentErrors(error.getKind());
 				}
 			});
+	}
+
+	private void showLoadingSpinner(boolean show) {
+		if (show) {
+			mProgressBar.setVisibility(View.VISIBLE);
+		} else {
+			mProgressBar.setVisibility(View.GONE);
+		}
+	}
+
+	private void showRecyclerView(boolean show) {
+		if (show) {
+			mRecyclerView.setVisibility(View.VISIBLE);
+		} else {
+			mRecyclerView.setVisibility(View.GONE);
+		}
+	}
+
+	private boolean isErrorFragmentAdded() {
+		return getActivity().getSupportFragmentManager().findFragmentByTag(ERROR_FRAGMENT_TAG) != null;
+	}
+
+	private void addErrorFragment() {
+		if (!isErrorFragmentAdded()) {
+			showRecyclerView(false);
+			getActivity().getSupportFragmentManager().beginTransaction()
+				.add(R.id.recycler_error_container, new ErrorFragment(), ERROR_FRAGMENT_TAG)
+				.commit();
+		}
+	}
+
+	private void removeErrorFragment() {
+		if (isErrorFragmentAdded()) {
+			showRecyclerView(true);
+			getActivity().getSupportFragmentManager()
+				.beginTransaction()
+				.remove(getActivity().getSupportFragmentManager().findFragmentByTag(ERROR_FRAGMENT_TAG))
+				.commit();
+		}
+
+	}
+
+	private void handleGetRecentErrors(RetrofitError.Kind errorKind) {
+		mSwipeRefreshLayout.setRefreshing(false);
+		showLoadingSpinner(false);
+		switch (errorKind) {
+			case HTTP:
+			case CONVERSION:
+			case UNEXPECTED:
+
+				break;
+			case NETWORK:
+
+				break;
+
+		}
+		addErrorFragment();
 	}
 
 }
