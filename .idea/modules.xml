@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/MCGridview.iml" filepath="$PROJECT_DIR$/MCGridview.iml" />
+      <module fileurl="file://$PROJECT_DIR$/FlikrGridView.iml" filepath="$PROJECT_DIR$/FlikrGridView.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
