@@ -88,7 +88,7 @@ public class FlikrApiClient {
 		}
 
 		public static String getPhotoUrl(Photo photo) {
-			return getPhotoUrl(photo, PhotoSize.MEDIUM_640);
+			return getPhotoUrl(photo, PhotoSize.SMALL_320);
 		}
 
 	}

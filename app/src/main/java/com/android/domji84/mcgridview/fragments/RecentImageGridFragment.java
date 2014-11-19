@@ -39,6 +39,7 @@ import retrofit.client.Response;
 import static com.android.domji84.mcgridview.AppConstants.KEY_ERROR_MESSAGE;
 import static com.android.domji84.mcgridview.AppConstants.TAG_ERROR_FRAGMENT;
 import static com.android.domji84.mcgridview.api.FlikrApiClient.FlikrApiUrls.getPhotoUrl;
+import static com.android.domji84.mcgridview.api.FlikrApiClient.PhotoSize.*;
 import static com.android.domji84.mcgridview.api.FlikrApiClient.getFlikrApiClient;
 
 /**
@@ -107,7 +108,9 @@ public class RecentImageGridFragment extends android.support.v4.app.Fragment imp
 			final Intent intent = new Intent(getActivity(), ImageViewerActivity.class);
 			final Bundle activityOptions = ActivityOptionsCompat.makeScaleUpAnimation(
 				view, 0, 0, view.getWidth(), view.getHeight()).toBundle();
-			intent.putExtra(AppConstants.KEY_IMAGE_URL, getPhotoUrl(mAdapter.getItemAt(position)));
+
+			// will get a large image for the preview activity
+			intent.putExtra(AppConstants.KEY_IMAGE_URL, getPhotoUrl(mAdapter.getItemAt(position), MEDIUM_640));
 			checkAndStartActivity(intent, activityOptions);
 		}
 	};
