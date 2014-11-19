@@ -76,7 +76,7 @@ public class RecentImageGridFragment extends android.support.v4.app.Fragment imp
 		mRecyclerView.setAnimationCacheEnabled(true);
 		mLayoutManager = new GridLayoutManager(getActivity(), DEFAULT_SPAN_COUNT);
 		mRecyclerView.setLayoutManager(mLayoutManager);
-		mAdapter = new GridItemAdapter(mGridItemObjectTapListener, mLoadImagesListener);
+		mAdapter = new GridItemAdapter(getActivity(), mGridItemObjectTapListener, mLoadImagesListener);
 		mRecyclerView.setAdapter(mAdapter);
 		calculateRecyclerViewSpanCount(mRecyclerView, mLayoutManager);
 

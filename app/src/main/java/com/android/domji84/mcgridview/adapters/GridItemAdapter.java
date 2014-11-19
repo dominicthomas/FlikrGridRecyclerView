@@ -1,5 +1,6 @@
 package com.android.domji84.mcgridview.adapters;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,19 +9,25 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.domji84.mcgridview.R;
-import com.android.domji84.mcgridview.api.FlikrApiClient;
 import com.android.domji84.mcgridview.api.model.Photo;
 import com.android.domji84.mcgridview.interfaces.GridItemObjectTapListener;
 import com.android.domji84.mcgridview.interfaces.LoadImagesListener;
+import com.android.domji84.mcgridview.utils.ConnectionTypeChecker;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.android.domji84.mcgridview.api.FlikrApiClient.FlikrApiUrls;
+import static com.android.domji84.mcgridview.api.FlikrApiClient.PhotoSize;
+import static com.android.domji84.mcgridview.utils.ConnectionTypeChecker.ConnectionType;
+
 /**
  * Created by domji84 on 18/11/14.
  */
 public class GridItemAdapter extends RecyclerView.Adapter<GridItemAdapter.ViewHolder> {
+
+	private Context mContext;
 
 	private List<Photo> mItems = new ArrayList<Photo>();
 
@@ -32,10 +39,12 @@ public class GridItemAdapter extends RecyclerView.Adapter<GridItemAdapter.ViewHo
 
 	private int mTotalPageCount;
 
-	public GridItemAdapter(GridItemObjectTapListener tapListener, LoadImagesListener loadImagesListener) {
+	private ConnectionType mConnectionType;
 
-		this.mTapListener = tapListener;
-		this.mLoadImagesListener = loadImagesListener;
+	public GridItemAdapter(Context context, GridItemObjectTapListener tapListener, LoadImagesListener loadImagesListener) {
+		mContext = context;
+		mTapListener = tapListener;
+		mLoadImagesListener = loadImagesListener;
 	}
 
 	public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -68,8 +77,9 @@ public class GridItemAdapter extends RecyclerView.Adapter<GridItemAdapter.ViewHo
 		final Photo item = mItems.get(position);
 		holder.owner.setText(item.getOwnerName());
 		Picasso.with(holder.image.getContext()).cancelRequest(holder.image);
-		Picasso.with(holder.image.getContext()).load(FlikrApiClient.FlikrApiUrls.getPhotoUrl(item,
-			FlikrApiClient.PhotoSize.MEDIUM_640)).into(holder.image);
+		Picasso.with(holder.image.getContext()).load(FlikrApiUrls.getPhotoUrl(item,
+			getPohtoSizeForConnection())).into(holder.image);
+
 		holder.image.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
@@ -92,7 +102,24 @@ public class GridItemAdapter extends RecyclerView.Adapter<GridItemAdapter.ViewHo
 				mLoadImagesListener.loadPage(newPage);
 			}
 		}
+	}
 
+	/**
+	 * Will check the connection type and return a small photo
+	 * size if on 3G/Mobile Data
+	 *
+	 * @return
+	 */
+	private PhotoSize getPohtoSizeForConnection() {
+		if (mConnectionType != null) {
+			switch (mConnectionType) {
+				case MOBILE:
+					return PhotoSize.SMALL_240;
+				case WIFI:
+					return PhotoSize.MEDIUM_640;
+			}
+		}
+		return PhotoSize.MEDIUM_640;
 	}
 
 	private int getDummyValue() {
@@ -108,7 +135,7 @@ public class GridItemAdapter extends RecyclerView.Adapter<GridItemAdapter.ViewHo
 		mItems.removeAll(mItems);
 		mItems = photoList;
 		setPageTracking(currentPage, totalPages);
-
+		checkConnectionType();
 		/*
 		Currently unable to load items with animations. We need to call
 		notifyItemInserted or notifyItemRangeInserted to trigger the RecyclerView
@@ -124,6 +151,7 @@ public class GridItemAdapter extends RecyclerView.Adapter<GridItemAdapter.ViewHo
 			mItems.add(photo);
 		}
 		setPageTracking(currentPage, totalPages);
+		checkConnectionType();
 		notifyDataSetChanged();
 	}
 
@@ -136,5 +164,9 @@ public class GridItemAdapter extends RecyclerView.Adapter<GridItemAdapter.ViewHo
 		if (position < mItems.size())
 			return mItems.get(position);
 		return null;
+	}
+
+	private void checkConnectionType() {
+		mConnectionType = ConnectionTypeChecker.getConnectionType(mContext);
 	}
 }
