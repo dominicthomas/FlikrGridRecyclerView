@@ -75,19 +75,15 @@ public class RecentImageGridFragment extends android.support.v4.app.Fragment imp
 		mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
 		mRecyclerView.setHasFixedSize(true);
 		mRecyclerView.setAnimationCacheEnabled(true);
-
 		mLayoutManager = new GridLayoutManager(getActivity(), DEFAULT_SPAN_COUNT);
 		mRecyclerView.setLayoutManager(mLayoutManager);
-
 		mAdapter = new GridItemAdapter(mGridItemObjectTapListener, mLoadImagesListener);
 		mRecyclerView.setAdapter(mAdapter);
-
 		calculateRecyclerViewSpanCount(mRecyclerView, mLayoutManager);
 
 		mProgressBar = (ProgressBar) view.findViewById(R.id.recycler_progress_bar);
-		showLoadingSpinner(true);
 
-		loadImageData(1);
+		loadImageData(1, true);
 	}
 
 	private void calculateRecyclerViewSpanCount(final RecyclerView recyclerView, final GridLayoutManager layoutManager){
@@ -129,7 +125,7 @@ public class RecentImageGridFragment extends android.support.v4.app.Fragment imp
 	private final LoadImagesListener mLoadImagesListener = new LoadImagesListener() {
 		@Override
 		public void loadPage(int page) {
-			loadImageData(page);
+			loadImageData(page, true);
 		}
 
 		@Override
@@ -142,7 +138,7 @@ public class RecentImageGridFragment extends android.support.v4.app.Fragment imp
 	@Override
 	public void onRefresh() {
 		// load first page
-		loadImageData(1);
+		loadImageData(1, false);
 	}
 
 	private void setupGridAdapterWithResult(int page, Recent recent) {
@@ -159,8 +155,9 @@ public class RecentImageGridFragment extends android.support.v4.app.Fragment imp
 		}
 	}
 
-	public void loadImageData(final int page) {
+	public void loadImageData(final int page, boolean showLoading) {
 		// don't show progress bar when loading first page
+		showLoadingSpinner(showLoading);
 		removeErrorFragment();
 		getFlikrApiClient().getRecentPhotos(
 			FlikrApiClient.FlikrApiParams.getRecentParams(page), new Callback<Recent>() {
