@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 
+import static com.android.domji84.mcgridview.AppConstants.*;
+
 /**
  * Created by domji84 on 18/11/14.
  */
@@ -13,6 +15,6 @@ public class ImageViewerActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
 		super.onCreate(savedInstanceState, persistentState);
 		setContentView(R.layout.activity_image_viewer);
-		String value = getIntent().getExtras().getString("url");
+		String value = getIntent().getExtras().getString(KEY_IMAGE_URL);
 	}
 }

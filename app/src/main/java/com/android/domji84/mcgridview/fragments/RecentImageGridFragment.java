@@ -18,6 +18,7 @@ import android.view.ViewTreeObserver;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.android.domji84.mcgridview.AppConstants;
 import com.android.domji84.mcgridview.ImageViewerActivity;
 import com.android.domji84.mcgridview.R;
 import com.android.domji84.mcgridview.adapters.GridItemAdapter;
@@ -44,9 +45,7 @@ import static com.android.domji84.mcgridview.api.FlikrApiClient.getFlikrApiClien
  */
 public class RecentImageGridFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
-	private static final String TAG = RecentImageGridFragment.class.getSimpleName();
-
-	private static final String ERROR_FRAGMENT_TAG = "error_fragment";
+	private static final String TAG_ERROR_FRAGMENT = "tag_error_fragment";
 
 	private static final int DEFAULT_SPAN_COUNT = 2;
 
@@ -106,11 +105,11 @@ public class RecentImageGridFragment extends android.support.v4.app.Fragment imp
 	private final GridItemObjectTapListener mGridItemObjectTapListener = new GridItemObjectTapListener() {
 		@Override
 		public void itemTap(View view, int position) {
-			Toast.makeText(getActivity(), "tapped " + position, Toast.LENGTH_SHORT).show();
+			Toast.makeText(getActivity(), "Tapped " + position, Toast.LENGTH_SHORT).show();
 			final Intent intent = new Intent(getActivity(), ImageViewerActivity.class);
 			final Bundle activityOptions = ActivityOptionsCompat.makeScaleUpAnimation(
 				view, 0, 0, view.getWidth(), view.getHeight()).toBundle();
-			intent.putExtra("url", getPhotoUrl(mAdapter.getItemAt(position)));
+			intent.putExtra(AppConstants.KEY_IMAGE_URL, getPhotoUrl(mAdapter.getItemAt(position)));
 			checkAndStartActivity(intent, activityOptions);
 		}
 	};
@@ -214,7 +213,7 @@ public class RecentImageGridFragment extends android.support.v4.app.Fragment imp
 	}
 
 	private boolean isErrorFragmentAdded() {
-		return getActivity().getSupportFragmentManager().findFragmentByTag(ERROR_FRAGMENT_TAG) != null;
+		return getActivity().getSupportFragmentManager().findFragmentByTag(TAG_ERROR_FRAGMENT) != null;
 	}
 
 	private void addErrorFragment(int messageId) {
@@ -227,7 +226,7 @@ public class RecentImageGridFragment extends android.support.v4.app.Fragment imp
 			errorFragment.setArguments(bundle);
 
 			getActivity().getSupportFragmentManager().beginTransaction()
-				.add(R.id.recycler_error_container, errorFragment, ERROR_FRAGMENT_TAG)
+				.add(R.id.recycler_error_container, errorFragment, TAG_ERROR_FRAGMENT)
 				.commit();
 		}
 	}
@@ -237,7 +236,7 @@ public class RecentImageGridFragment extends android.support.v4.app.Fragment imp
 			showRecyclerView(true);
 			getActivity().getSupportFragmentManager()
 				.beginTransaction()
-				.remove(getActivity().getSupportFragmentManager().findFragmentByTag(ERROR_FRAGMENT_TAG))
+				.remove(getActivity().getSupportFragmentManager().findFragmentByTag(TAG_ERROR_FRAGMENT))
 				.commit();
 		}
 
