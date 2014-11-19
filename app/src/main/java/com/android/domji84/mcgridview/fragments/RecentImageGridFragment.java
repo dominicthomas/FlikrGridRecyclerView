@@ -1,13 +1,13 @@
 package com.android.domji84.mcgridview.fragments;
 
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -35,6 +35,7 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
+import static com.android.domji84.mcgridview.AppConstants.KEY_ERROR_MESSAGE;
 import static com.android.domji84.mcgridview.api.FlikrApiClient.FlikrApiUrls.getPhotoUrl;
 import static com.android.domji84.mcgridview.api.FlikrApiClient.getFlikrApiClient;
 
@@ -45,7 +46,7 @@ public class RecentImageGridFragment extends android.support.v4.app.Fragment imp
 
 	private static final String TAG = RecentImageGridFragment.class.getSimpleName();
 
-	private static final String ERROR_FRAGMENT_TAG = "error";
+	private static final String ERROR_FRAGMENT_TAG = "error_fragment";
 
 	private static final int DEFAULT_SPAN_COUNT = 2;
 
@@ -86,7 +87,7 @@ public class RecentImageGridFragment extends android.support.v4.app.Fragment imp
 		loadImageData(1, true);
 	}
 
-	private void calculateRecyclerViewSpanCount(final RecyclerView recyclerView, final GridLayoutManager layoutManager){
+	private void calculateRecyclerViewSpanCount(final RecyclerView recyclerView, final GridLayoutManager layoutManager) {
 		recyclerView.getViewTreeObserver().addOnGlobalLayoutListener(
 			new ViewTreeObserver.OnGlobalLayoutListener() {
 				@Override
@@ -131,14 +132,14 @@ public class RecentImageGridFragment extends android.support.v4.app.Fragment imp
 		@Override
 		public void noMorePages() {
 			Toast.makeText(getActivity(), getActivity().getString(
-					R.string.no_more_pages_message), Toast.LENGTH_SHORT).show();
+				R.string.no_more_pages_message), Toast.LENGTH_SHORT).show();
 		}
 	};
 
 	@Override
 	public void onRefresh() {
 		// load first page
-		loadImageData(1, false);
+		loadImageData(1, isErrorFragmentAdded() ? true : false);
 	}
 
 	private void setupGridAdapterWithResult(int page, Recent recent) {
@@ -179,6 +180,23 @@ public class RecentImageGridFragment extends android.support.v4.app.Fragment imp
 			});
 	}
 
+	private void handleGetRecentErrors(RetrofitError.Kind errorKind) {
+		mSwipeRefreshLayout.setRefreshing(false);
+		showLoadingSpinner(false);
+		switch (errorKind) {
+			case HTTP:
+			case CONVERSION:
+			case UNEXPECTED:
+				addErrorFragment(R.string.api_error_message);
+				break;
+			case NETWORK:
+				addErrorFragment(R.string.network_error_message);
+				break;
+			default:
+				addErrorFragment(R.string.api_error_message);
+		}
+	}
+
 	private void showLoadingSpinner(boolean show) {
 		if (show) {
 			mProgressBar.setVisibility(View.VISIBLE);
@@ -199,11 +217,17 @@ public class RecentImageGridFragment extends android.support.v4.app.Fragment imp
 		return getActivity().getSupportFragmentManager().findFragmentByTag(ERROR_FRAGMENT_TAG) != null;
 	}
 
-	private void addErrorFragment() {
+	private void addErrorFragment(int messageId) {
 		if (!isErrorFragmentAdded()) {
 			showRecyclerView(false);
+
+			final Fragment errorFragment = new ErrorFragment();
+			final Bundle bundle = new Bundle();
+			bundle.putString(KEY_ERROR_MESSAGE, getActivity().getString(messageId));
+			errorFragment.setArguments(bundle);
+
 			getActivity().getSupportFragmentManager().beginTransaction()
-				.add(R.id.recycler_error_container, new ErrorFragment(), ERROR_FRAGMENT_TAG)
+				.add(R.id.recycler_error_container, errorFragment, ERROR_FRAGMENT_TAG)
 				.commit();
 		}
 	}
@@ -217,23 +241,6 @@ public class RecentImageGridFragment extends android.support.v4.app.Fragment imp
 				.commit();
 		}
 
-	}
-
-	private void handleGetRecentErrors(RetrofitError.Kind errorKind) {
-		mSwipeRefreshLayout.setRefreshing(false);
-		showLoadingSpinner(false);
-		switch (errorKind) {
-			case HTTP:
-			case CONVERSION:
-			case UNEXPECTED:
-
-				break;
-			case NETWORK:
-
-				break;
-
-		}
-		addErrorFragment();
 	}
 
 }

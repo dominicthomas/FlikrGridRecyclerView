@@ -2,13 +2,30 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
-                android:background="@android:color/holo_blue_light"
+                android:background="@color/light_gray"
                 android:layout_height="match_parent">
 
-    <ImageView
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_centerInParent="true"
-        android:src="@drawable/img_sadface"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
+
+        <ImageView
+            android:id="@+id/error_fragment_image"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/img_sadface"/>
+
+        <TextView
+            android:id="@+id/error_fragment_message"
+            android:layout_below="@+id/error_fragment_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="28dp"/>
+
+    </RelativeLayout>
+
 
 </RelativeLayout>
