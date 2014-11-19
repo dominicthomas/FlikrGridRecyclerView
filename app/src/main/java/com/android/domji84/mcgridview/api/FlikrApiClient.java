@@ -95,6 +95,12 @@ public class FlikrApiClient {
 
 	public interface FlikrApiInterface {
 
+		/**
+		 * For a query map of default or custom parameters for this call,
+		 * call FlikrApiParams.getRecentParams and pass in the page requested.
+		 * @param getRecentParams
+		 * @param callback
+		 */
 		@GET("/rest")
 		void getRecentPhotos(@QueryMap Map<String, String> getRecentParams, Callback<Recent> callback);
 	}

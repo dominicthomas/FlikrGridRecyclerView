@@ -106,7 +106,7 @@ public class GridItemAdapter extends RecyclerView.Adapter<GridItemAdapter.ViewHo
 
 	/**
 	 * Will check the connection type and return a small photo
-	 * size if on 3G/Mobile Data
+	 * size if on 3G/Mobile Data and large one if there is WIFI
 	 *
 	 * @return
 	 */
@@ -114,12 +114,12 @@ public class GridItemAdapter extends RecyclerView.Adapter<GridItemAdapter.ViewHo
 		if (mConnectionType != null) {
 			switch (mConnectionType) {
 				case MOBILE:
-					return PhotoSize.SMALL_240;
+					return PhotoSize.LARGE_SQUARE_150;
 				case WIFI:
-					return PhotoSize.MEDIUM_640;
+					return PhotoSize.SMALL_320;
 			}
 		}
-		return PhotoSize.MEDIUM_640;
+		return PhotoSize.SMALL_240;
 	}
 
 	private int getDummyValue() {
