@@ -11,7 +11,7 @@ import android.widget.TextView;
 import com.android.domji84.mcgridview.R;
 import com.google.common.base.Optional;
 
-import static com.android.domji84.mcgridview.AppConstants.KEY_ERROR_MESSAGE;
+import static com.android.domji84.mcgridview.app.AppConstants.KEY_ERROR_MESSAGE;
 
 /**
  * Created by domji84 on 19/11/14.

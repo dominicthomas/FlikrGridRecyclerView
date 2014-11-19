@@ -1,4 +1,4 @@
-package com.android.domji84.mcgridview;
+package com.android.domji84.mcgridview.app;
 
 /**
  * Created by domji84 on 19/11/14.

@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 
-import static com.android.domji84.mcgridview.AppConstants.*;
+import static com.android.domji84.mcgridview.app.AppConstants.*;
 
 /**
  * Created by domji84 on 18/11/14.

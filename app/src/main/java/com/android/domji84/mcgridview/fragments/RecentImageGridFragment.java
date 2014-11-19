@@ -18,7 +18,7 @@ import android.view.ViewTreeObserver;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.android.domji84.mcgridview.AppConstants;
+import com.android.domji84.mcgridview.app.AppConstants;
 import com.android.domji84.mcgridview.ImageViewerActivity;
 import com.android.domji84.mcgridview.R;
 import com.android.domji84.mcgridview.adapters.GridItemAdapter;
@@ -36,8 +36,8 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-import static com.android.domji84.mcgridview.AppConstants.KEY_ERROR_MESSAGE;
-import static com.android.domji84.mcgridview.AppConstants.TAG_ERROR_FRAGMENT;
+import static com.android.domji84.mcgridview.app.AppConstants.KEY_ERROR_MESSAGE;
+import static com.android.domji84.mcgridview.app.AppConstants.TAG_ERROR_FRAGMENT;
 import static com.android.domji84.mcgridview.api.FlikrApiClient.FlikrApiUrls.getPhotoUrl;
 import static com.android.domji84.mcgridview.api.FlikrApiClient.PhotoSize.*;
 import static com.android.domji84.mcgridview.api.FlikrApiClient.getFlikrApiClient;
