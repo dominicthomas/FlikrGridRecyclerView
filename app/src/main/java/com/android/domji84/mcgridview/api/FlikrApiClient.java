@@ -23,7 +23,7 @@ public class FlikrApiClient {
 	private static String API_KEY = "0a6006474b146381616f256798b2916f";
 	private static String API_SECRET = "053be28f04771e3e";
 
-	public static enum PhotoSize {
+	public enum PhotoSize {
 
 		SMALL_SQUARE_75("s"),
 		LARGE_SQUARE_150("q"),
@@ -84,7 +84,7 @@ public class FlikrApiClient {
 
 		public static String getPhotoUrl(Photo photo, PhotoSize size) {
 			return Joiner.on("").join("https://farm", photo.getFarm(), ".staticflickr.com/", photo.getServer(),
-				"/", photo.getId(), "_", photo.getSecret(), "_" + size.getSize() + ".jpg").toString();
+					"/", photo.getId(), "_", photo.getSecret(), "_" + size.getSize() + ".jpg");
 		}
 
 		public static String getPhotoUrl(Photo photo) {

@@ -1,12 +1,12 @@
 package com.android.domji84.mcgridview;
 
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 
 import com.android.domji84.mcgridview.fragments.RecentImageGridFragment;
 
 
-public class HomeActivity extends ActionBarActivity {
+public class HomeActivity extends AppCompatActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
